@@ -170,7 +170,7 @@ if __name__ == '__main__':
 
     pop=[]
     n_var=3
-    popsize=7#5
+    popsize=5
     pop=initialize_pop(popsize,n_var+1,config)
     print(pop)
     n_iters=10#7
