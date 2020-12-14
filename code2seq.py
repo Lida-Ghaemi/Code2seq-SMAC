@@ -42,24 +42,24 @@ def evaluate_each_indiv(config,i):
 ####################################################
 def mymutate(indiv,ind):
     #va={64,128,256, 512}
-    myNUM_EPOCHS=[3,4,5,6,7,8]
-    myTraining_batch_size=[64, 128, 256, 512]
-    myLSTMs_size=[16, 32,64,128,256]
+    myNUM_EPOCHS=[7,8,9,10,11]
+    myTraining_batch_size=[128, 256, 512]
+    #myLSTMs_size=[16, 32,64,128,256]
     #myNumber_of_Decoder_layers: any value
     #myMax_target_length={1-10}
     #for i in range(len(indiv)):
     
     if ind==0:
-      d1=np.random.randint(0,high=4,dtype=int)
+      d1=np.random.randint(0,high=3,dtype=int)
       indiv[0]=myTraining_batch_size[d1]
     elif ind==1:
-      b1=np.random.randint(0,high=6,dtype=int)
+      b1=np.random.randint(0,high=5,dtype=int)
       #indiv[1]=myLSTMs_size[b1]
       indiv[1]=myNUM_EPOCHS[b1]
     #elif ind==2:
      # indiv[2]=np.random.randint(1,high=4,dtype=int)
     else: 
-      indiv[2]=np.random.randint(1,high=11,dtype=int)
+      indiv[2]=np.random.randint(6,high=11,dtype=int)
       config.BATCH_SIZE=indiv[0]
       #config.RNN_SIZE =indiv[1]*2
       config.NUM_EPOCHS =indiv[1]
@@ -73,20 +73,20 @@ def mymutate(indiv,ind):
 def initialize_pop(popsize,n_var,config):
     #va={64,128,256, 512}
     myTraining_batch_size=[64, 128, 256, 512]
-    myLSTMs_size=[16, 32,64,128,256]
-    myNUM_EPOCHS=[3,4,5,6,7,8]
+    #myLSTMs_size=[16, 32,64,128,256]
+    myNUM_EPOCHS=[7,8,9,10,11]
     #myNumber_of_Decoder_layers: any value
     #myMax_target_length={1-10}
     pop=[]
     for i in range(popsize):
       
       indiv=[0]*n_var
-      d1=np.random.randint(0,high=4,dtype=int)
-      b1=np.random.randint(0,high=6,dtype=int)
+      d1=np.random.randint(0,high=3,dtype=int)
+      b1=np.random.randint(0,high=5,dtype=int)
       indiv[0]=myTraining_batch_size[d1]
       #indiv[1]=myLSTMs_size[b1]
       indiv[1]=myNUM_EPOCHS[b1]
-      indiv[2]=np.random.randint(1,high=10,dtype=int)#myMax_target_length
+      indiv[2]=np.random.randint(6,high=11,dtype=int)#myMax_target_length
       #indiv[3]=np.random.randint(1,high=10,dtype=int)
       config.BATCH_SIZE=indiv[0]
       #config.RNN_SIZE =indiv[1]*2
@@ -169,11 +169,11 @@ if __name__ == '__main__':
     #############
 
     pop=[]
-    n_var=3#4
-    popsize=5
+    n_var=3
+    popsize=7#5
     pop=initialize_pop(popsize,n_var+1,config)
     print(pop)
-    n_iters=7
+    n_iters=10#7
     p_mutate=0.3
     cross_p=0.6
     for i in range(n_iters):
