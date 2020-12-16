@@ -7,131 +7,25 @@ import tensorflow as tf
 from config import Config
 from interactive_predict import InteractivePredictor
 from model import Model
+##-----------------------------------------------------from SMAC ------------------------------
+import logging
 
-#################################################
-def evaluate_each_indiv(config,i):
-    
-    #print("i am in evaluate_ga$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    #if config.TRAIN_PATH:
-    model = Model(config)
-    if i>0: #for the case where reuse is True inside GA
-        model.train2()
-        #if args.data_path:
-        results, precision, recall, f1, rouge = model.evaluate()
-        #print("i am out of evaluate$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print('Accuracy: ' + str(results))
-        print('Precision: ' + str(precision) + ', recall: ' + str(recall) + ', F1: ' + str(f1))
-        print('Rouge: ', rouge)
-    else:#for the case where reuse is False inside GA-first indiv
-        model.train1()
-        #if args.data_path:
-        results, precision, recall, f1, rouge = model.evaluate()
-        #print("i am out of evaluate$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print('Accuracy: ' + str(results))
-        print('Precision: ' + str(precision) + ', recall: ' + str(recall) + ', F1: ' + str(f1))
-        print('Rouge: ', rouge)
-        
-    #if args.predict:
-    #    predictor = InteractivePredictor(config, model)
-      #  predictor.predict()
-   # if args.release and args.load_path:
-     #   model.evaluate(release=True)
-   # print("i have finished f111111111yyyyyyyyy")
-    model.close_session()
-    return f1
-####################################################
-def mymutate(indiv,ind):
-    #va={64,128,256, 512}
-    myNUM_EPOCHS=[7,8,9,10,11]
-    myTraining_batch_size=[128, 256, 512]
-    #myLSTMs_size=[16, 32,64,128,256]
-    #myNumber_of_Decoder_layers: any value
-    #myMax_target_length={1-10}
-    #for i in range(len(indiv)):
-    
-    if ind==0:
-      d1=np.random.randint(0,high=3,dtype=int)
-      indiv[0]=myTraining_batch_size[d1]
-    elif ind==1:
-      b1=np.random.randint(0,high=5,dtype=int)
-      #indiv[1]=myLSTMs_size[b1]
-      indiv[1]=myNUM_EPOCHS[b1]
-    #elif ind==2:
-     # indiv[2]=np.random.randint(1,high=4,dtype=int)
-    else: 
-      indiv[2]=np.random.randint(6,high=11,dtype=int)
-      config.BATCH_SIZE=indiv[0]
-      #config.RNN_SIZE =indiv[1]*2
-      config.NUM_EPOCHS =indiv[1]
-      #config.NUM_DECODER_LAYERS=indiv[2]
-      config.MAX_TARGET_PARTS=indiv[2]
-      #model = Model(config)
-      indiv[3]=evaluate_each_indiv(config,1)
-    #print(indiv)
-    return indiv
-###############################################################
-def initialize_pop(popsize,n_var,config):
-    #va={64,128,256, 512}
-    myTraining_batch_size=[64, 128, 256, 512]
-    #myLSTMs_size=[16, 32,64,128,256]
-    myNUM_EPOCHS=[7,8,9,10,11]
-    #myNumber_of_Decoder_layers: any value
-    #myMax_target_length={1-10}
-    pop=[]
-    for i in range(popsize):
-      
-      indiv=[0]*n_var
-      d1=np.random.randint(0,high=3,dtype=int)
-      b1=np.random.randint(0,high=5,dtype=int)
-      indiv[0]=myTraining_batch_size[d1]
-      #indiv[1]=myLSTMs_size[b1]
-      indiv[1]=myNUM_EPOCHS[b1]
-      indiv[2]=np.random.randint(6,high=11,dtype=int)#myMax_target_length
-      #indiv[3]=np.random.randint(1,high=10,dtype=int)
-      config.BATCH_SIZE=indiv[0]
-      #config.RNN_SIZE =indiv[1]*2
-      config.NUM_EPOCHS =indiv[1]
-      #config.NUM_DECODER_LAYERS=indiv[2]
-      config.MAX_TARGET_PARTS=indiv[2]
-      #model = Model(config)
-      indiv[3]=evaluate_each_indiv(config,i)
-      
-      pop+=[indiv]
-      #model.close_session()
-    print("initialization finished")
-    return pop
-##################################################
-def mycross(pop,cross_p,popsize,n_var):
-  for i in range(np.math.ceil(popsize/2)):
-    r=np.random.randint(low=0,high=popsize, size=2,dtype=int)#crossover selection for two indivi
-    cpoint=np.random.randint(low=1,high=n_var, size=1,dtype=int)# croxover point
-    temp1=pop[r[0]]
-    temp2=pop[r[1]]
-    temp1[cpoint[0]:]=pop[r[1]][cpoint[0]:]
-    temp2[cpoint[0]:]=pop[r[0]][cpoint[0]:]
-    config.BATCH_SIZE=temp1[0]
-      #config.RNN_SIZE =indiv[1]*2
-    config.NUM_EPOCHS =temp1[1]
-      #config.NUM_DECODER_LAYERS=indiv[2]
-    config.MAX_TARGET_PARTS=temp1[2]
-      #model = Model(config)
-   
-    temp1[n_var]=evaluate_each_indiv(config,1)
-    config.BATCH_SIZE=temp2[0]
-      #config.RNN_SIZE =indiv[1]*2
-    config.NUM_EPOCHS =temp2[1]
-      #config.NUM_DECODER_LAYERS=indiv[2]
-    config.MAX_TARGET_PARTS=temp2[2]
-      #model = Model(config)
-    temp2[n_var]=evaluate_each_indiv(config,1)
-    
-    if temp1[n_var]>pop[r[0]][n_var]:
-      pop[r[0]]=temp1
-    if temp2[n_var]>pop[r[1]][n_var]:
-      pop[r[1]]=temp2
-  return pop    
+import numpy as np
+from ConfigSpace.conditions import InCondition
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
+    UniformFloatHyperparameter, UniformIntegerHyperparameter
+from sklearn import svm, datasets
+from sklearn.model_selection import cross_val_score
 
-#################################################
+# Import ConfigSpace and different types of parameters
+from smac.configspace import ConfigurationSpace
+from smac.facade.smac_hpo_facade import SMAC4HPO
+# Import SMAC-utilities
+from smac.scenario.scenario import 
+# --------------------------------------------------------------
+import os
+import sys
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
@@ -152,42 +46,113 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     np.random.seed(args.seed)
-    tf.set_random_seed(args.seed)
+    #tf.set_random_seed(args.seed)
     #tf.random.set_seed(args.seed)
     ############################################################
     #print(args.debug)
 
-    if args.debug:
-        config = Config.get_debug_config(args)
-    else:
-        config = Config.get_default_config(args)
+    #if args.debug:
+     #   config = Config.get_debug_config(args)
+   # else:
+    #    config = Config.get_default_config(args)
+    config = Config.get_default_config(args)    
     #print(config.BATCH_SIZE)
-    ###GA
-    #varbound=np.array([[0,10]]*3)
-    #modelga=ga(function=f,dimension=3,variable_type='real',variable_boundaries=varbound)
-    #modelga.run()
-    #############
+    ##########################SMAC##############################
+    
+    
 
-    pop=[]
-    n_var=3
-    popsize=5
-    pop=initialize_pop(popsize,n_var+1,config)
-    print(pop)
-    n_iters=10#7
-    p_mutate=0.3
-    cross_p=0.6
-    for i in range(n_iters):
-        pop=mycross(pop,cross_p,popsize,n_var)# crossover
-        for j in range(popsize):#loop for muration
-            r=np.random.random(1)
-            if r<p_mutate:
-                temp=mymutate(pop[j], np.random.randint(4))
-                if temp[n_var]>pop[j][n_var]:
-                    pop[j]=temp
-    pop = sorted(pop, key = lambda x:x[n_var-1]) 
-    print(pop)
-    best=pop[-1]
+# --------------------------------------------------------------
 
+
+
+#sys.path.append(os.path.join(os.path.dirname(__file__)))
+#from mlp_from_cfg_func import mlp_from_cfg  # noqa: E402
+
+logger = logging.getLogger("log")
+logging.basicConfig(level=logging.INFO)
+def svm_from_cfg(cfg):
+    """ Creates a SVM based on a configuration and evaluates it on the
+    iris-dataset using cross-validation.
+    Parameters:
+    -----------
+    cfg: Configuration (ConfigSpace.ConfigurationSpace.Configuration)
+        Configuration containing the parameters.
+        Configurations are indexable!
+    Returns:
+    --------
+    A crossvalidated mean score for the svm on the loaded data-set.
+    """
+    # For deactivated parameters, the configuration stores None-values.
+    # This is not accepted by the SVM, so we remove them.
+    cfg = {k: cfg[k] for k in cfg if cfg[k]}
+    # We translate boolean values:
+    cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
+    # And for gamma, we set it to a fixed value or to "auto" (if used)
+    #if "gamma" in cfg:
+      #  cfg["gamma"] = cfg["gamma_value"] if cfg["gamma"] == "value" else "auto"
+     #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
+
+#    clf = svm.SVC(**cfg, random_state=42)
+    model = Model(config)
+    model.train()
+    results, precision, recall, f1, rouge = model.evaluate()
+    return f1
+
+    # Build Configuration Space which defines all parameters and their ranges.
+    # To illustrate different parameter types,
+    # we use continuous, integer and categorical parameters.
+    cs = ConfigurationSpace()
+    config.BATCH_SIZE=UniformIntegerHyperparameter('config.BATCH_SIZE', 128, 512, default_value=128)
+    config.NUM_EPOCHS =UniformIntegerHyperparameter('config.NUM_EPOCHS', 7, 11, default_value=7)
+    config.MAX_TARGET_PARTS=UniformIntegerHyperparameter('config.MAX_TARGET_PARTS', 6, 10, default_value=6)
+
+    # We can add multiple hyperparameters at once:
+    #n_layer = UniformIntegerHyperparameter("n_layer", 1, 5, default_value=1)
+    #n_neurons = UniformIntegerHyperparameter("n_neurons", 8, 1024, log=True, default_value=10)
+    #activation = CategoricalHyperparameter("activation", ['logistic', 'tanh', 'relu'],
+    #                                       default_value='tanh')
+    #batch_size = UniformIntegerHyperparameter('batch_size', 64, 256, default_value=64)
+    #learning_rate_init = UniformFloatHyperparameter('learning_rate_init', 0.0001, 1.0, default_value=0.001, log=True)
+    cs.add_hyperparameters([ batch_size])
+
+    # SMAC scenario object
+    scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternative to runtime)
+                         "wallclock-limit": 100,  # max duration to run the optimization (in seconds)
+                         "cs": cs,  # configuration space
+                         "deterministic": "true",
+                         #"limit_resources": True,  # Uses pynisher to limit memory and runtime
+                         # Alternatively, you can also disable this.
+                         # Then you should handle runtime and memory yourself in the TA
+                         "cutoff": 30,  # runtime limit for target algorithm
+                         #"memory_limit": 3072,  # adapt this to reasonable value for your hardware
+                         })
+
+    # max budget for hyperband can be anything. Here, we set it to maximum no. of epochs to train the MLP for
+    max_iters = 5
+    # intensifier parameters
+    intensifier_kwargs = {'initial_budget': 5, 'max_budget': max_iters, 'eta': 3}
+    # To optimize, we pass the function to the SMAC-object
+    smac = HB4AC(scenario=scenario, rng=np.random.RandomState(42),
+                 tae_runner=mlp_from_cfg,
+                 intensifier_kwargs=intensifier_kwargs)  # all arguments related to intensifier can be passed like this
+
+    # Example call of the function with default values
+    # It returns: Status, Cost, Runtime, Additional Infos
+    def_value = smac.get_tae_runner().run(config=cs.get_default_configuration(),
+                                          instance='1', budget=max_iters, seed=0)[1]
+    print("Value for default configuration: %.4f" % def_value)
+
+    # Start optimization
+    try:
+        incumbent = smac.optimize()
+    finally:
+        incumbent = smac.solver.incumbent
+
+    inc_value = smac.get_tae_runner().run(config=incumbent, instance='1',
+                                          budget=max_iters, seed=0)[1]
+    print("Optimized Value: %.4f" % inc_value)
+
+   ##########################SMAC------end---------------##############################
     config.BATCH_SIZE=best[0]
       #config.RNN_SIZE =indiv[1]*2
     config.NUM_EPOCHS =best[1]
