@@ -25,7 +25,7 @@ from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
-ii=0
+
 def mysmac_from_cfg(cfg):
     
     # For deactivated parameters, the configuration stores None-values.
@@ -54,6 +54,7 @@ def mysmac_from_cfg(cfg):
     return f1
 
 if __name__ == '__main__':
+    ii=0
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
                         help="path to preprocessed dataset", required=False)
