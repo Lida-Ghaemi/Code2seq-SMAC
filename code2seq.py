@@ -72,7 +72,7 @@ if __name__ == '__main__':
         config = Config.get_default_config(args)
     
     
-    print(config.load_path)
+   # print(config.load_path)
     ##########################SMAC##############################
     # logger = logging.getLogger("SVMExample")
     logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
