@@ -26,6 +26,25 @@ from smac.scenario.scenario import
 import os
 import sys
 
+def mysmac_from_cfg(cfg):
+    
+    # For deactivated parameters, the configuration stores None-values.
+    # This is not accepted by the SVM, so we remove them.
+    cfg = {k: cfg[k] for k in cfg if cfg[k]}
+    # We translate boolean values:
+    #cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
+    # And for gamma, we set it to a fixed value or to "auto" (if used)
+    #if "gamma" in cfg:
+      #  cfg["gamma"] = cfg["gamma_value"] if cfg["gamma"] == "value" else "auto"
+     #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
+
+#    clf = svm.SVC(**cfg, random_state=42)
+    
+    model = Model(cfg)
+    model.train()
+    results, precision, recall, f1, rouge = model.evaluate()
+    return f1
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
@@ -46,111 +65,84 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     np.random.seed(args.seed)
-    #tf.set_random_seed(args.seed)
-    #tf.random.set_seed(args.seed)
-    ############################################################
-    #print(args.debug)
-
-    #if args.debug:
-     #   config = Config.get_debug_config(args)
-   # else:
-    #    config = Config.get_default_config(args)
-    config = Config.get_default_config(args)    
+    tf.set_random_seed(args.seed)
+    if args.debug:
+        config = Config.get_debug_config(args)
+    else:
+        config = Config.get_default_config(args)
+    
+    
     #print(config.BATCH_SIZE)
     ##########################SMAC##############################
-    
-    
+    # logger = logging.getLogger("SVMExample")
+    logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
 
-# --------------------------------------------------------------
-
-
-
-#sys.path.append(os.path.join(os.path.dirname(__file__)))
-#from mlp_from_cfg_func import mlp_from_cfg  # noqa: E402
-
-logger = logging.getLogger("log")
-logging.basicConfig(level=logging.INFO)
-def svm_from_cfg(cfg):
-    """ Creates a SVM based on a configuration and evaluates it on the
-    iris-dataset using cross-validation.
-    Parameters:
-    -----------
-    cfg: Configuration (ConfigSpace.ConfigurationSpace.Configuration)
-        Configuration containing the parameters.
-        Configurations are indexable!
-    Returns:
-    --------
-    A crossvalidated mean score for the svm on the loaded data-set.
-    """
-    # For deactivated parameters, the configuration stores None-values.
-    # This is not accepted by the SVM, so we remove them.
-    cfg = {k: cfg[k] for k in cfg if cfg[k]}
-    # We translate boolean values:
-    cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
-    # And for gamma, we set it to a fixed value or to "auto" (if used)
-    #if "gamma" in cfg:
-      #  cfg["gamma"] = cfg["gamma_value"] if cfg["gamma"] == "value" else "auto"
-     #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
-
-#    clf = svm.SVC(**cfg, random_state=42)
-    model = Model(config)
-    model.train()
-    results, precision, recall, f1, rouge = model.evaluate()
-    return f1
-
-    # Build Configuration Space which defines all parameters and their ranges.
-    # To illustrate different parameter types,
-    # we use continuous, integer and categorical parameters.
+    # Build Configuration Space which defines all parameters and their ranges
     cs = ConfigurationSpace()
-    config.BATCH_SIZE=UniformIntegerHyperparameter('config.BATCH_SIZE', 128, 512, default_value=128)
-    config.NUM_EPOCHS =UniformIntegerHyperparameter('config.NUM_EPOCHS', 7, 11, default_value=7)
-    config.MAX_TARGET_PARTS=UniformIntegerHyperparameter('config.MAX_TARGET_PARTS', 6, 10, default_value=6)
+    config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128)
+    cs.add_hyperparameters([C, shrinking])
+    config.NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
+      
+    config.MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
 
-    # We can add multiple hyperparameters at once:
-    #n_layer = UniformIntegerHyperparameter("n_layer", 1, 5, default_value=1)
-    #n_neurons = UniformIntegerHyperparameter("n_neurons", 8, 1024, log=True, default_value=10)
-    #activation = CategoricalHyperparameter("activation", ['logistic', 'tanh', 'relu'],
-    #                                       default_value='tanh')
-    #batch_size = UniformIntegerHyperparameter('batch_size', 64, 256, default_value=64)
-    #learning_rate_init = UniformFloatHyperparameter('learning_rate_init', 0.0001, 1.0, default_value=0.001, log=True)
-    cs.add_hyperparameters([ batch_size])
+    # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
+    #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
+    #cs.add_hyperparameter(kernel)
 
-    # SMAC scenario object
-    scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternative to runtime)
-                         "wallclock-limit": 100,  # max duration to run the optimization (in seconds)
+    # There are some hyperparameters shared by all kernels
+    C = UniformFloatHyperparameter("C", 0.001, 1000.0, default_value=1.0)
+    shrinking = CategoricalHyperparameter("shrinking", ["true", "false"], default_value="true")
+    cs.add_hyperparameters([C, shrinking])
+
+    # Others are kernel-specific, so we can add conditions to limit the searchspace
+    degree = UniformIntegerHyperparameter("degree", 1, 5, default_value=3)  # Only used by kernel poly
+    coef0 = UniformFloatHyperparameter("coef0", 0.0, 10.0, default_value=0.0)  # poly, sigmoid
+    cs.add_hyperparameters([degree, coef0])
+    use_degree = InCondition(child=degree, parent=kernel, values=["poly"])
+    use_coef0 = InCondition(child=coef0, parent=kernel, values=["poly", "sigmoid"])
+    cs.add_conditions([use_degree, use_coef0])
+
+    # This also works for parameters that are a mix of categorical and values from a range of numbers
+    # For example, gamma can be either "auto" or a fixed float
+    gamma = CategoricalHyperparameter("gamma", ["auto", "value"], default_value="auto")  # only rbf, poly, sigmoid
+    gamma_value = UniformFloatHyperparameter("gamma_value", 0.0001, 8, default_value=1)
+    cs.add_hyperparameters([gamma, gamma_value])
+    # We only activate gamma_value if gamma is set to "value"
+    cs.add_condition(InCondition(child=gamma_value, parent=gamma, values=["value"]))
+    # And again we can restrict the use of gamma in general to the choice of the kernel
+    cs.add_condition(InCondition(child=gamma, parent=kernel, values=["rbf", "poly", "sigmoid"]))
+
+    # Scenario object
+    scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
+                         "runcount-limit": 50,  # max. number of function evaluations; for this example set to a low number
                          "cs": cs,  # configuration space
-                         "deterministic": "true",
-                         #"limit_resources": True,  # Uses pynisher to limit memory and runtime
-                         # Alternatively, you can also disable this.
-                         # Then you should handle runtime and memory yourself in the TA
-                         "cutoff": 30,  # runtime limit for target algorithm
-                         #"memory_limit": 3072,  # adapt this to reasonable value for your hardware
+                         "deterministic": "true"
                          })
 
-    # max budget for hyperband can be anything. Here, we set it to maximum no. of epochs to train the MLP for
-    max_iters = 5
-    # intensifier parameters
-    intensifier_kwargs = {'initial_budget': 5, 'max_budget': max_iters, 'eta': 3}
-    # To optimize, we pass the function to the SMAC-object
-    smac = HB4AC(scenario=scenario, rng=np.random.RandomState(42),
-                 tae_runner=mlp_from_cfg,
-                 intensifier_kwargs=intensifier_kwargs)  # all arguments related to intensifier can be passed like this
-
-    # Example call of the function with default values
+    # Example call of the function
     # It returns: Status, Cost, Runtime, Additional Infos
-    def_value = smac.get_tae_runner().run(config=cs.get_default_configuration(),
-                                          instance='1', budget=max_iters, seed=0)[1]
-    print("Value for default configuration: %.4f" % def_value)
+    def_value = mysmac_from_cfg(cs.get_default_configuration())
+    print("Default Value: %.2f" % (def_value))
 
-    # Start optimization
-    try:
-        incumbent = smac.optimize()
-    finally:
-        incumbent = smac.solver.incumbent
+    # Optimize, using a SMAC-object
+    print("Optimizing! Depending on your machine, this might take a few minutes.")
+    smac = SMAC4HPO(scenario=scenario, rng=np.random.RandomState(42),
+                    tae_runner=mysmac_from_cfg)
 
-    inc_value = smac.get_tae_runner().run(config=incumbent, instance='1',
-                                          budget=max_iters, seed=0)[1]
-    print("Optimized Value: %.4f" % inc_value)
+    incumbent = smac.optimize()
+
+    inc_value = mysmac_from_cfg(incumbent)
+
+    print("Optimized Value: %.2f" % (inc_value))
+
+    # We can also validate our results (though this makes a lot more sense with instances)
+    smac.validate(config_mode='inc',  # We can choose which configurations to evaluate
+                  # instance_mode='train+test',  # Defines what instances to validate
+                  repetitions=100,  # Ignored, unless you set "deterministic" to "false" in line 95
+                  n_jobs=1)  # How many cores to use in parallel for optimization
+    
+
+    
 
    ##########################SMAC------end---------------##############################
     config.BATCH_SIZE=best[0]
