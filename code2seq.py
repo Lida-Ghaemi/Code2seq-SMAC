@@ -25,7 +25,7 @@ from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
-
+ii=0
 def mysmac_from_cfg(cfg):
     
     # For deactivated parameters, the configuration stores None-values.
