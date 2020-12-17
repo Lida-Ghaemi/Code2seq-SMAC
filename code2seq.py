@@ -80,37 +80,16 @@ if __name__ == '__main__':
     # Build Configuration Space which defines all parameters and their ranges
     cs = ConfigurationSpace()
     config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128)
-    cs.add_hyperparameters([C, shrinking])
+    
     config.NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
       
     config.MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
-
+    cs.add_hyperparameters([config.BATCH_SIZE,config.NUM_EPOCHS,config.MAX_TARGET_PARTS])
     # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
     #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
     #cs.add_hyperparameter(kernel)
 
-    # There are some hyperparameters shared by all kernels
-    C = UniformFloatHyperparameter("C", 0.001, 1000.0, default_value=1.0)
-    shrinking = CategoricalHyperparameter("shrinking", ["true", "false"], default_value="true")
-    cs.add_hyperparameters([C, shrinking])
-
-    # Others are kernel-specific, so we can add conditions to limit the searchspace
-    degree = UniformIntegerHyperparameter("degree", 1, 5, default_value=3)  # Only used by kernel poly
-    coef0 = UniformFloatHyperparameter("coef0", 0.0, 10.0, default_value=0.0)  # poly, sigmoid
-    cs.add_hyperparameters([degree, coef0])
-    use_degree = InCondition(child=degree, parent=kernel, values=["poly"])
-    use_coef0 = InCondition(child=coef0, parent=kernel, values=["poly", "sigmoid"])
-    cs.add_conditions([use_degree, use_coef0])
-
-    # This also works for parameters that are a mix of categorical and values from a range of numbers
-    # For example, gamma can be either "auto" or a fixed float
-    gamma = CategoricalHyperparameter("gamma", ["auto", "value"], default_value="auto")  # only rbf, poly, sigmoid
-    gamma_value = UniformFloatHyperparameter("gamma_value", 0.0001, 8, default_value=1)
-    cs.add_hyperparameters([gamma, gamma_value])
-    # We only activate gamma_value if gamma is set to "value"
-    cs.add_condition(InCondition(child=gamma_value, parent=gamma, values=["value"]))
-    # And again we can restrict the use of gamma in general to the choice of the kernel
-    cs.add_condition(InCondition(child=gamma, parent=kernel, values=["rbf", "poly", "sigmoid"]))
+    
 
     # Scenario object
     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
@@ -145,11 +124,11 @@ if __name__ == '__main__':
     
 
    ##########################SMAC------end---------------##############################
-    config.BATCH_SIZE=best[0]
-      #config.RNN_SIZE =indiv[1]*2
-    config.NUM_EPOCHS =best[1]
-      #config.NUM_DECODER_LAYERS=indiv[2]
-    config.MAX_TARGET_PARTS=best[2]
+#     config.BATCH_SIZE=best[0]
+#       #config.RNN_SIZE =indiv[1]*2
+#     config.NUM_EPOCHS =best[1]
+#       #config.NUM_DECODER_LAYERS=indiv[2]
+#     config.MAX_TARGET_PARTS=best[2]
       #model = Model(config)
 
      #def print_hyperparams(self):
