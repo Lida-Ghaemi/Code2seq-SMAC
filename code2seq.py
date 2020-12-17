@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
     # Example call of the function
     # It returns: Status, Cost, Runtime, Additional Infos
-    def_value = mysmac_from_cfg(cs.get_default_configuration())
+    def_value = mysmac_from_cfg(config)#cs.get_default_configuration()
     print("Default Value: %.2f" % (def_value))
 
     # Optimize, using a SMAC-object
