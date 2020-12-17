@@ -25,6 +25,7 @@ from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
+global ii
 ii=0
 def mysmac_from_cfg(cfg):
     
