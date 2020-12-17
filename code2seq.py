@@ -30,7 +30,7 @@ def mysmac_from_cfg(cfg):
     
     # For deactivated parameters, the configuration stores None-values.
     # This is not accepted by the SVM, so we remove them.
-    cfg = {k: cfg[k] for k in cfg if cfg[k]}
+    #cfg = {k: cfg[k] for k in cfg if cfg[k]}
     # We translate boolean values:
     #cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
     # And for gamma, we set it to a fixed value or to "auto" (if used)
