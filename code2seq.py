@@ -79,7 +79,11 @@ if __name__ == '__main__':
 
     # Build Configuration Space which defines all parameters and their ranges
     cs = ConfigurationSpace()
+    aa=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
+    print("dash bashuvaaaaaaaaaaaaaaaaaaaaaaa")
+    print(aa)
     config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
+    
     config.NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
     config.MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
     cs.add_hyperparameters([config.BATCH_SIZE,config.NUM_EPOCHS,config.MAX_TARGET_PARTS])
