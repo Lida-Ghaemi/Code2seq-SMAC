@@ -25,7 +25,7 @@ from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
-global ii
+
 ii=0
 def mysmac_from_cfg(cfg):
     
@@ -44,6 +44,7 @@ def mysmac_from_cfg(cfg):
     config.NUM_EPOCHS = cfg['NUM_EPOCHS']
     config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']   
     model = Model(config)
+    global ii
     if ii>0: #for the case where reuse is True inside GA
         model.train2()
         results, precision, recall, f1, rouge = model.evaluate()
@@ -55,7 +56,7 @@ def mysmac_from_cfg(cfg):
     return f1
 
 if __name__ == '__main__':
-    ii=0
+    
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
                         help="path to preprocessed dataset", required=False)
