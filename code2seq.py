@@ -30,7 +30,7 @@ def mysmac_from_cfg(cfg):
     
     # For deactivated parameters, the configuration stores None-values.
     # This is not accepted by the SVM, so we remove them.
-    #cfg = {k: cfg[k] for k in cfg if cfg[k]}
+    cfg = {k: cfg[k] for k in cfg if cfg[k]}
     # We translate boolean values:
     #cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
     # And for gamma, we set it to a fixed value or to "auto" (if used)
@@ -39,8 +39,10 @@ def mysmac_from_cfg(cfg):
      #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
 
 #    clf = svm.SVC(**cfg, random_state=42)
-    
-    model = Model(cfg)
+    config.BATCH_SIZE = cfg['BATCH_SIZE']
+    config.NUM_EPOCHS = cfg['NUM_EPOCHS']
+    config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']   
+    model = Model(config)
     model.train()
     results, precision, recall, f1, rouge = model.evaluate()
     return f1
@@ -79,14 +81,13 @@ if __name__ == '__main__':
 
     # Build Configuration Space which defines all parameters and their ranges
     cs = ConfigurationSpace()
-    aa=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
+    BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
     print("dash bashuvaaaaaaaaaaaaaaaaaaaaaaa")
     print(aa)
-    config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
     
-    config.NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
-    config.MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
-    cs.add_hyperparameters([config.BATCH_SIZE,config.NUM_EPOCHS,config.MAX_TARGET_PARTS])
+    NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
+    MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
+    cs.add_hyperparameters([BATCH_SIZE,NUM_EPOCHS,MAX_TARGET_PARTS])
     # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
     #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
     #cs.add_hyperparameter(kernel)
@@ -129,7 +130,7 @@ if __name__ == '__main__':
 
     # Example call of the function
     # It returns: Status, Cost, Runtime, Additional Infos
-    def_value = mysmac_from_cfg(config)#cs.get_default_configuration()
+    def_value = mysmac_from_cfg(cs.get_default_configuration())
     print("Default Value: %.2f" % (def_value))
 
     # Optimize, using a SMAC-object
