@@ -21,7 +21,7 @@ from sklearn.model_selection import cross_val_score
 from smac.configspace import ConfigurationSpace
 from smac.facade.smac_hpo_facade import SMAC4HPO
 # Import SMAC-utilities
-from smac.scenario.scenario import 
+from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
