@@ -87,6 +87,36 @@ if __name__ == '__main__':
     #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
     #cs.add_hyperparameter(kernel)
     # Scenario object
+    config.SAVE_EVERY_EPOCHS = 1
+    config.PATIENCE = 10
+    config.TEST_BATCH_SIZE = 256
+    config.READER_NUM_PARALLEL_BATCHES = 1
+    config.SHUFFLE_BUFFER_SIZE = 10000
+    config.CSV_BUFFER_SIZE = 100 * 1024 * 1024  # 100 MB
+    config.MAX_CONTEXTS = 200
+    config.SUBTOKENS_VOCAB_MAX_SIZE = 190000
+    config.TARGET_VOCAB_MAX_SIZE = 27000
+    config.EMBEDDINGS_SIZE = 128
+    config.RNN_SIZE = 128 * 2  # Two LSTMs to embed paths, each of size 128
+    config.DECODER_SIZE = 320
+    config.NUM_DECODER_LAYERS = 1
+    config.MAX_PATH_LENGTH = 8 + 1
+    config.MAX_NAME_PARTS = 5
+    config.MAX_TARGET_PARTS = 6
+    config.EMBEDDINGS_DROPOUT_KEEP_PROB = 0.75
+    config.RNN_DROPOUT_KEEP_PROB = 0.5
+    config.BIRNN = True
+    config.RANDOM_CONTEXTS = True
+    config.BEAM_WIDTH = 0
+    config.USE_MOMENTUM = True
+    #####################
+    config.TRAIN_PATH = args.data_path
+    config.TEST_PATH = args.test_path if args.test_path is not None else ''
+    config.DATA_NUM_CONTEXTS = 0
+    config.SAVE_PATH = args.save_path_prefix
+    config.LOAD_PATH = args.load_path
+    config.RELEASE = args.release
+    ###################
     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
                          "runcount-limit": 50,  # max. number of function evaluations; for this example set to a low number
                          "cs": cs,  # configuration space
