@@ -72,25 +72,20 @@ if __name__ == '__main__':
         config = Config.get_default_config(args)
     
     
-    #print(config.BATCH_SIZE)
+    print(config.load_path)
     ##########################SMAC##############################
     # logger = logging.getLogger("SVMExample")
     logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
 
     # Build Configuration Space which defines all parameters and their ranges
     cs = ConfigurationSpace()
-    config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128)
-    
+    config.BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
     config.NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
-      
     config.MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
     cs.add_hyperparameters([config.BATCH_SIZE,config.NUM_EPOCHS,config.MAX_TARGET_PARTS])
     # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
     #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
     #cs.add_hyperparameter(kernel)
-
-    
-
     # Scenario object
     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
                          "runcount-limit": 50,  # max. number of function evaluations; for this example set to a low number
