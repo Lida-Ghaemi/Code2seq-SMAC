@@ -25,8 +25,8 @@ from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
 import os
 import sys
-
-def mysmac_from_cfg(cfg,i):
+ii=0
+def mysmac_from_cfg(cfg):
     
     # For deactivated parameters, the configuration stores None-values.
     # This is not accepted by the SVM, so we remove them.
@@ -43,12 +43,13 @@ def mysmac_from_cfg(cfg,i):
     config.NUM_EPOCHS = cfg['NUM_EPOCHS']
     config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']   
     model = Model(config)
-    if i>0: #for the case where reuse is True inside GA
+    if ii>0: #for the case where reuse is True inside GA
         model.train2()
         results, precision, recall, f1, rouge = model.evaluate()
 
     else:#for the case where reuse is False inside GA-first indiv
         model.train1()
+        ii=2
         results, precision, recall, f1, rouge = model.evaluate()
     return f1
 
@@ -133,7 +134,7 @@ if __name__ == '__main__':
 
     # Example call of the function
     # It returns: Status, Cost, Runtime, Additional Infos
-    def_value = mysmac_from_cfg(cs.get_default_configuration(),0)
+    def_value = mysmac_from_cfg(cs.get_default_configuration())
     print("Default Value: %.2f" % (def_value))
 
     # Optimize, using a SMAC-object
@@ -143,7 +144,7 @@ if __name__ == '__main__':
 
     incumbent = smac.optimize()
 
-    inc_value = mysmac_from_cfg(incumbent,2)
+    inc_value = mysmac_from_cfg(incumbent)
 
     print("Optimized Value: %.2f" % (inc_value))
 
