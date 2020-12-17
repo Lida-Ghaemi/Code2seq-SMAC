@@ -126,7 +126,7 @@ if __name__ == '__main__':
 #     config.RELEASE = args.release
     ###################
     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
-                         "runcount-limit": 50,  # max. number of function evaluations; for this example set to a low number
+                         "runcount-limit": 5,  # max. number of function evaluations; for this example set to a low number
                          "cs": cs,  # configuration space
                          "deterministic": "true"
                          })
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     # We can also validate our results (though this makes a lot more sense with instances)
     smac.validate(config_mode='inc',  # We can choose which configurations to evaluate
                   # instance_mode='train+test',  # Defines what instances to validate
-                  repetitions=100,  # Ignored, unless you set "deterministic" to "false" in line 95
+                  repetitions=3,  # Ignored, unless you set "deterministic" to "false" in line 95
                   n_jobs=1)  # How many cores to use in parallel for optimization
     
 
