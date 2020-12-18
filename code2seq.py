@@ -56,16 +56,16 @@ def mysmac_from_cfg(cfg):
 #    clf = svm.SVC(**cfg, random_state=42)
     #print('############## ')
     #print(config.BATCH_SIZE)
-    config.BATCH_SIZE = cfg['BATCH_SIZE']
+    config1.BATCH_SIZE = cfg['BATCH_SIZE']
     #print('###########   ')
     #print(config.BATCH_SIZE)
-    config.NUM_EPOCHS = cfg['NUM_EPOCHS']
+    config1.NUM_EPOCHS = cfg['NUM_EPOCHS']
     #print('###########   ')
    # print(type(config.NUM_EPOCHS))
-    config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']  
+    config1.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']  
     #print('###########   ')
     #print(config.MAX_TARGET_PARTS)
-    model = Model(config)
+    model = Model(config1)
     
     global ii
     if ii>0: #for the case where reuse is True inside GA
@@ -101,9 +101,9 @@ if __name__ == '__main__':
     np.random.seed(args.seed)
     tf.set_random_seed(args.seed)
     if args.debug:
-        config = Config.get_debug_config(args)
+        config1 = Config.get_debug_config(args)
     else:
-        config = Config.get_default_config(args)
+        config1 = Config.get_default_config(args)
     cs = ConfigurationSpace()
     #logger = logging.getLogger("MLP-example")
     logging.basicConfig(level=logging.INFO)
@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
     # Example call of the function with default values
     # It returns: Status, Cost, Runtime, Additional Infos
-    def_value = smac.get_tae_runner().run(config1=cs.get_default_configuration(),
+    def_value = smac.get_tae_runner().run(config=cs.get_default_configuration(),
                                           instance='1', budget=max_iters, seed=0)[1]
     print("Value for default configuration: %.4f" % def_value)
 
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     finally:
         incumbent = smac.solver.incumbent
 
-    inc_value = smac.get_tae_runner().run(config1=incumbent, instance='1',
+    inc_value = smac.get_tae_runner().run(config=incumbent, instance='1',
                                           budget=max_iters, seed=0)[1]
     print("Optimized Value: %.4f" % inc_value)
 ##################-----smac mlp-----###################
@@ -196,37 +196,37 @@ if __name__ == '__main__':
       #model = Model(config)
 
      #def print_hyperparams(self):
-    print('Training batch size:\t\t\t', config.BATCH_SIZE)
-    print('Epochs:\t\t', config.NUM_EPOCHS)
-    print('Max target length:\t\t\t', config.MAX_TARGET_PARTS)
-    print('Dataset path:\t\t\t\t', config.TRAIN_PATH)
-    print('Training file path:\t\t\t', config.TRAIN_PATH + '.train.c2s')
-    print('Validation path:\t\t\t', config.TEST_PATH)
-    print('Taking max contexts from each example:\t', config.MAX_CONTEXTS)
-    print('Random path sampling:\t\t\t', config.RANDOM_CONTEXTS)
-    print('Embedding size:\t\t\t\t', config.EMBEDDINGS_SIZE)
-    if config.BIRNN:
-        print('Using BiLSTMs, each of size:\t\t', config.RNN_SIZE // 2)
+    print('Training batch size:\t\t\t', config1.BATCH_SIZE)
+    print('Epochs:\t\t\t\t', config1.NUM_EPOCHS)
+    print('Max target length:\t\t\t', config1.MAX_TARGET_PARTS)
+    print('Dataset path:\t\t\t\t', config1.TRAIN_PATH)
+    print('Training file path:\t\t\t', config1.TRAIN_PATH + '.train.c2s')
+    print('Validation path:\t\t\t', config1.TEST_PATH)
+    print('Taking max contexts from each example:\t', config1.MAX_CONTEXTS)
+    print('Random path sampling:\t\t\t', config1.RANDOM_CONTEXTS)
+    print('Embedding size:\t\t\t\t', config1.EMBEDDINGS_SIZE)
+    if config1.BIRNN:
+        print('Using BiLSTMs, each of size:\t\t', config1.RNN_SIZE // 2)
     else:
-        print('Uni-directional LSTM of size:\t\t', config.RNN_SIZE)
-    print('Decoder size:\t\t\t\t', config.DECODER_SIZE)
-    print('Decoder layers:\t\t\t\t', config.NUM_DECODER_LAYERS)
-    print('Max path lengths:\t\t\t', config.MAX_PATH_LENGTH)
-    print('Max subtokens in a token:\t\t', config.MAX_NAME_PARTS)
-    print('Embeddings dropout keep_prob:\t\t', config.EMBEDDINGS_DROPOUT_KEEP_PROB)
-    print('LSTM dropout keep_prob:\t\t\t', config.RNN_DROPOUT_KEEP_PROB)
+        print('Uni-directional LSTM of size:\t\t', config1.RNN_SIZE)
+    print('Decoder size:\t\t\t\t', config1.DECODER_SIZE)
+    print('Decoder layers:\t\t\t\t', config1.NUM_DECODER_LAYERS)
+    print('Max path lengths:\t\t\t', config1.MAX_PATH_LENGTH)
+    print('Max subtokens in a token:\t\t', config1.MAX_NAME_PARTS)
+    print('Embeddings dropout keep_prob:\t\t', config1.EMBEDDINGS_DROPOUT_KEEP_PROB)
+    print('LSTM dropout keep_prob:\t\t\t', config1.RNN_DROPOUT_KEEP_PROB)
     print('============================================') 
     #aa=evaluate_each_indiv(model,config)
     #print("heyyyyyyyyyyyyyyyyy I am starting main train\n")
     
-    model = Model(config)
+    model = Model(config1)
     print("\n************************************* this is the config to train ************************************\n ")
-    print(config.BATCH_SIZE,config.NUM_EPOCHS ,config.MAX_TARGET_PARTS)
+    print(config1.BATCH_SIZE,config1.NUM_EPOCHS ,config1.MAX_TARGET_PARTS)
       #model = Model(config)
     print('Created model')
-    if config.TRAIN_PATH:
+    if config1.TRAIN_PATH:
         model.train()
-    if config.TEST_PATH and not args.data_path:
+    if config1.TEST_PATH and not args.data_path:
         results, precision, recall, f1, rouge = model.evaluate()
         print('Accuracy: ' + str(results))
         print('Precision: ' + str(precision) + ', recall: ' + str(recall) + ', F1: ' + str(f1))
