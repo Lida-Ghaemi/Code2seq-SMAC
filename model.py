@@ -91,7 +91,7 @@ class Model:
          #   self.save_model(self.sess, self.config.SAVE_PATH + '.final')
          #   print('Model saved in file: %s' % self.config.SAVE_PATH)
 
-        elapsed = int(time.time() - start_time)
+        #elapsed = int(time.time() - start_time)
         #print("Training time: %sh%sm%ss\n" % ((elapsed // 60 // 60), (elapsed // 60) % 60, elapsed % 60))
   ################################################      
     def train2(self):
@@ -126,7 +126,7 @@ class Model:
          #   self.save_model(self.sess, self.config.SAVE_PATH + '.final')
          #   print('Model saved in file: %s' % self.config.SAVE_PATH)
 
-        elapsed = int(time.time() - start_time)
+        #elapsed = int(time.time() - start_time)
         #print("Training time: %sh%sm%ss\n" % ((elapsed // 60 // 60), (elapsed // 60) % 60, elapsed % 60))
 ############################
     def train(self):
