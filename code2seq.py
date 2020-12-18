@@ -71,8 +71,10 @@ def mysmac_from_cfg(cfg):
     print("iiiiiiiiiiiiiiii     ")
     print(ii)
     if ii>0: #for the case where reuse is True inside GA
+        print("-----------------------------i am here ii>0-----------------")
         model.train2()
         results, precision, recall, f1, rouge = model.evaluate()
+        ii=2
 
     else:#for the case where reuse is False inside GA-first indiv
         model.train1()
@@ -82,9 +84,9 @@ def mysmac_from_cfg(cfg):
         results, precision, recall, f1, rouge = model.evaluate()
     ii=2
     return f1
-
+ii=0
 if __name__ == '__main__':
-    ii=0
+    
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
                         help="path to preprocessed dataset", required=False)
@@ -169,7 +171,7 @@ if __name__ == '__main__':
                          })
 
     # max budget for hyperband can be anything. Here, we set it to maximum no. of epochs to train the MLP for
-    max_iters = 50
+    max_iters = 3
     # intensifier parameters
     intensifier_kwargs = {'initial_budget': 5, 'max_budget': max_iters, 'eta': 3}
     # To optimize, we pass the function to the SMAC-object
