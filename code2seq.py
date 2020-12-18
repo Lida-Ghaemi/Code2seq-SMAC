@@ -41,49 +41,7 @@ import os
 import sys
 
 
-def mysmac_from_cfg(cfg):
-    
-    # For deactivated parameters, the configuration stores None-values.
-    # This is not accepted by the SVM, so we remove them.
-    cfg = {k: cfg[k] for k in cfg if cfg[k]}
-    # We translate boolean values:
-    #cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
-    # And for gamma, we set it to a fixed value or to "auto" (if used)
-    #if "gamma" in cfg:
-      #  cfg["gamma"] = cfg["gamma_value"] if cfg["gamma"] == "value" else "auto"
-     #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
 
-#    clf = svm.SVC(**cfg, random_state=42)
-    #print('############## ')
-    #print(config.BATCH_SIZE)
-    config1.BATCH_SIZE = cfg['BATCH_SIZE']
-    #print('###########   ')
-    #print(config.BATCH_SIZE)
-    config1.NUM_EPOCHS = cfg['NUM_EPOCHS']
-    #print('###########   ')
-   # print(type(config.NUM_EPOCHS))
-    config1.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']  
-    #print('###########   ')
-    #print(config.MAX_TARGET_PARTS)
-    model = Model(config1)
-    
-    global ii
-    print("iiiiiiiiiiiiiiii     ")
-    print(ii)
-    if ii>0: #for the case where reuse is True inside GA
-        print("-----------------------------i am here ii>0-----------------")
-        model.train2()
-        results, precision, recall, f1, rouge = model.evaluate()
-        ii=2
-
-    else:#for the case where reuse is False inside GA-first indiv
-        model.train1()
-        ii=2
-        print("otheriiiiiiiiiiiiiiii     ")
-        print(ii)
-        results, precision, recall, f1, rouge = model.evaluate()
-    ii=2
-    return f1
 ii=0
 if __name__ == '__main__':
     
@@ -245,3 +203,46 @@ if __name__ == '__main__':
         model.evaluate(release=True)
     model.close_session()
 
+def mysmac_from_cfg(cfg):
+    
+    # For deactivated parameters, the configuration stores None-values.
+    # This is not accepted by the SVM, so we remove them.
+    cfg = {k: cfg[k] for k in cfg if cfg[k]}
+    # We translate boolean values:
+    #cfg["shrinking"] = True if cfg["shrinking"] == "true" else False
+    # And for gamma, we set it to a fixed value or to "auto" (if used)
+    #if "gamma" in cfg:
+      #  cfg["gamma"] = cfg["gamma_value"] if cfg["gamma"] == "value" else "auto"
+     #   cfg.pop("gamma_value", None)  # Remove "gamma_value"
+
+#    clf = svm.SVC(**cfg, random_state=42)
+    #print('############## ')
+    #print(config.BATCH_SIZE)
+    config1.BATCH_SIZE = cfg['BATCH_SIZE']
+    #print('###########   ')
+    #print(config.BATCH_SIZE)
+    config1.NUM_EPOCHS = cfg['NUM_EPOCHS']
+    #print('###########   ')
+   # print(type(config.NUM_EPOCHS))
+    config1.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']  
+    #print('###########   ')
+    #print(config.MAX_TARGET_PARTS)
+    model = Model(config1)
+    
+    global ii
+    print("iiiiiiiiiiiiiiii     ")
+    print(ii)
+    if ii>0: #for the case where reuse is True inside GA
+        print("-----------------------------i am here ii>0-----------------")
+        model.train2()
+        results, precision, recall, f1, rouge = model.evaluate()
+        ii=2
+
+    else:#for the case where reuse is False inside GA-first indiv
+        model.train1()
+        ii=2
+        print("otheriiiiiiiiiiiiiiii     ")
+        print(ii)
+        results, precision, recall, f1, rouge = model.evaluate()
+    ii=2
+    return f1
