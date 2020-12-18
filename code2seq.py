@@ -104,24 +104,24 @@ if __name__ == '__main__':
         config1 = Config.get_debug_config(args)
     else:
         config1 = Config.get_default_config(args)
-    cs = ConfigurationSpace()
+    
     #logger = logging.getLogger("MLP-example")
-    logging.basicConfig(level=logging.INFO)
+   
    # print(config.load_path)
     ##########################SMAC##############################
-#     # logger = logging.getLogger("SVMExample")
-#     logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
+    # logger = logging.getLogger("SVMExample")
+    logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
 
-#     # Build Configuration Space which defines all parameters and their ranges
-#     #cs = ConfigurationSpace()
-#     BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
-#     #print("dash bashuvaaaaaaaaaaaaaaaaaaaaaaa")   
-#     NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
-#     MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
-#     cs.add_hyperparameters([BATCH_SIZE,NUM_EPOCHS,MAX_TARGET_PARTS])
-#     # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
-#     #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
-#     #cs.add_hyperparameter(kernel)
+    # Build Configuration Space which defines all parameters and their ranges
+    cs = ConfigurationSpace()
+    BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
+    #print("dash bashuvaaaaaaaaaaaaaaaaaaaaaaa")   
+    NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
+    MAX_TARGET_PARTS=UniformIntegerHyperparameter("MAX_TARGET_PARTS", 6, 11, default_value=6)
+    cs.add_hyperparameters([BATCH_SIZE,NUM_EPOCHS,MAX_TARGET_PARTS])
+    # We define a few possible types of SVM-kernels and add them as "kernel" to our cs
+    #kernel = CategoricalHyperparameter("kernel", ["linear", "rbf", "poly", "sigmoid"], default_value="poly")
+    #cs.add_hyperparameter(kernel)
 #     # Scenario object
 #     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternatively runtime)
 #                          "runcount-limit": 5,  # max. number of function evaluations; for this example set to a low number
