@@ -145,7 +145,7 @@ class Model:
                                           node_to_index=self.node_to_index,
                                           target_to_index=self.target_to_index,
                                           config=self.config)
-        optimizer, train_loss = self.build_training_graph(self.queue_thread.get_output())
+        optimizer, train_loss = self.build_training_graph1(self.queue_thread.get_output())
         self.print_hyperparams()
         print('Number of trainable params:',
               np.sum([np.prod(v.get_shape().as_list()) for v in tf.trainable_variables()]))
@@ -728,6 +728,52 @@ class Model:
             attention_weights = tf.squeeze(final_states.alignment_history.stack(), 1)
 
         return predicted_indices, topk_values, target_index, attention_weights
+#----------------------------------------------for smac to set reuse ==0----------------------------------
+    def build_test_graph3(self, input_tensors):
+        target_index = input_tensors[reader.TARGET_INDEX_KEY]
+        path_source_indices = input_tensors[reader.PATH_SOURCE_INDICES_KEY]
+        node_indices = input_tensors[reader.NODE_INDICES_KEY]
+        path_target_indices = input_tensors[reader.PATH_TARGET_INDICES_KEY]
+        valid_mask = input_tensors[reader.VALID_CONTEXT_MASK_KEY]
+        path_source_lengths = input_tensors[reader.PATH_SOURCE_LENGTHS_KEY]
+        path_lengths = input_tensors[reader.PATH_LENGTHS_KEY]
+        path_target_lengths = input_tensors[reader.PATH_TARGET_LENGTHS_KEY]
+
+        with tf.variable_scope('model'):
+            subtoken_vocab = tf.get_variable('SUBTOKENS_VOCAB',
+                                             shape=(self.subtoken_vocab_size, self.config.EMBEDDINGS_SIZE),
+                                             dtype=tf.float32, trainable=False)
+            target_words_vocab = tf.get_variable('TARGET_WORDS_VOCAB',
+                                                 shape=(self.target_vocab_size, self.config.EMBEDDINGS_SIZE),
+                                                 dtype=tf.float32, trainable=False)
+            nodes_vocab = tf.get_variable('NODES_VOCAB',
+                                          shape=(self.nodes_vocab_size, self.config.EMBEDDINGS_SIZE),
+                                          dtype=tf.float32, trainable=False)
+
+            batched_contexts = self.compute_contexts(subtoken_vocab=subtoken_vocab, nodes_vocab=nodes_vocab,
+                                                     source_input=path_source_indices, nodes_input=node_indices,
+                                                     target_input=path_target_indices,
+                                                     valid_mask=valid_mask,
+                                                     path_source_lengths=path_source_lengths,
+                                                     path_lengths=path_lengths, path_target_lengths=path_target_lengths,
+                                                     is_evaluating=True)
+
+            outputs, final_states = self.decode_outputs(target_words_vocab=target_words_vocab,
+                                                        target_input=target_index, batch_size=tf.shape(target_index)[0],
+                                                        batched_contexts=batched_contexts, valid_mask=valid_mask,
+                                                        is_evaluating=True)
+
+        if self.config.BEAM_WIDTH > 0:
+            predicted_indices = outputs.predicted_ids
+            topk_values = outputs.beam_search_decoder_output.scores
+            attention_weights = [tf.no_op()]
+        else:
+            predicted_indices = outputs.sample_id
+            topk_values = tf.constant(1, shape=(1, 1), dtype=tf.float32)
+            attention_weights = tf.squeeze(final_states.alignment_history.stack(), 1)
+
+        return predicted_indices, topk_values, target_index, attention_weights
+    
 
     def predict(self, predict_data_lines):
         if self.predict_queue is None:
