@@ -90,15 +90,16 @@ if __name__ == '__main__':
         config = Config.get_debug_config(args)
     else:
         config = Config.get_default_config(args)
-    
-    
+    cs = ConfigurationSpace()
+    #logger = logging.getLogger("MLP-example")
+    logging.basicConfig(level=logging.INFO)
    # print(config.load_path)
     ##########################SMAC##############################
 #     # logger = logging.getLogger("SVMExample")
 #     logging.basicConfig(level=logging.INFO)  # logging.DEBUG for debug output
 
 #     # Build Configuration Space which defines all parameters and their ranges
-#     cs = ConfigurationSpace()
+#     #cs = ConfigurationSpace()
 #     BATCH_SIZE=UniformIntegerHyperparameter('BATCH_SIZE', 128, 512, default_value=128) 
 #     #print("dash bashuvaaaaaaaaaaaaaaaaaaaaaaa")   
 #     NUM_EPOCHS =UniformIntegerHyperparameter("NUM_EPOCHS", 7, 11, default_value=7)
