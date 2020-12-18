@@ -84,7 +84,7 @@ def mysmac_from_cfg(cfg):
     return f1
 
 if __name__ == '__main__':
-    
+    ii=0
     parser = ArgumentParser()
     parser.add_argument("-d", "--data", dest="data_path",
                         help="path to preprocessed dataset", required=False)
