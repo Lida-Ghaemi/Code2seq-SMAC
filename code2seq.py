@@ -170,7 +170,7 @@ if __name__ == '__main__':
                          })
 
     # max budget for hyperband can be anything. Here, we set it to maximum no. of epochs to train the MLP for
-    max_iters = 3
+    max_iters = 10
     # intensifier parameters
     intensifier_kwargs = {'initial_budget': 5, 'max_budget': max_iters, 'eta': 3}
     # To optimize, we pass the function to the SMAC-object
