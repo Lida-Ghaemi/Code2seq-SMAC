@@ -14,7 +14,7 @@ import numpy as np
 from ConfigSpace.conditions import InCondition
 from ConfigSpace.hyperparameters import CategoricalHyperparameter, \
     UniformFloatHyperparameter, UniformIntegerHyperparameter
-from sklearn import svm, datasets
+from sklearn import datasets
 from sklearn.model_selection import cross_val_score
 
 # Import ConfigSpace and different types of parameters
@@ -23,6 +23,20 @@ from smac.facade.smac_hpo_facade import SMAC4HPO
 # Import SMAC-utilities
 from smac.scenario.scenario import Scenario
 # --------------------------------------------------------------
+
+import warnings
+
+#import ConfigSpace as CS
+from sklearn.datasets import load_digits
+from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+
+
+
+from smac.facade.smac_bohb_facade import BOHB4HPO
+
+
+#-----------------------------------------
 import os
 import sys
 
