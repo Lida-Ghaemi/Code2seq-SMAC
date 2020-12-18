@@ -78,6 +78,7 @@ def mysmac_from_cfg(cfg):
         model.train1()
         ii=2
         results, precision, recall, f1, rouge = model.evaluate()
+    ii=2
     return f1
 
 if __name__ == '__main__':
