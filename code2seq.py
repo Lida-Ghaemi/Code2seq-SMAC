@@ -41,8 +41,14 @@ def mysmac_from_cfg(cfg):
 
 #    clf = svm.SVC(**cfg, random_state=42)
     config.BATCH_SIZE = cfg['BATCH_SIZE']
+    print('###########   ')
+    print(config.BATCH_SIZE)
     config.NUM_EPOCHS = cfg['NUM_EPOCHS']
-    config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']   
+    print('###########   ')
+    print(type(config.NUM_EPOCHS))
+    config.MAX_TARGET_PARTS = cfg['MAX_TARGET_PARTS']  
+    print('###########   ')
+    print(config.MAX_TARGET_PARTS)
     model = Model(config)
     global ii
     if ii>0: #for the case where reuse is True inside GA
