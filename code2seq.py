@@ -159,18 +159,18 @@ if __name__ == '__main__':
    ##########################SMAC------end---------------##############################
     # SMAC scenario object
     scenario = Scenario({"run_obj": "quality",  # we optimize quality (alternative to runtime)
-                         "wallclock-limit": 10,  #100 max duration to run the optimization (in seconds)
+                         "wallclock-limit": 40,  #100 max duration to run the optimization (in seconds)
                          "cs": cs,  # configuration space
                          "deterministic": "true",
                          "limit_resources": True,  # Uses pynisher to limit memory and runtime
                          # Alternatively, you can also disable this.
                          # Then you should handle runtime and memory yourself in the TA
-                         "cutoff": 10,  #30 runtime limit for target algorithm
+                         "cutoff": 15,  #30 runtime limit for target algorithm
                          "memory_limit": 307,  # 3072adapt this to reasonable value for your hardware
                          })
 
     # max budget for hyperband can be anything. Here, we set it to maximum no. of epochs to train the MLP for
-    max_iters = 10
+    max_iters = 15
     # intensifier parameters
     intensifier_kwargs = {'initial_budget': 5, 'max_budget': max_iters, 'eta': 3}
     # To optimize, we pass the function to the SMAC-object
